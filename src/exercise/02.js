@@ -4,34 +4,35 @@
 import * as React from 'react'
 import {Switch} from '../switch'
 
-function Toggle() {
+function Toggle({children}) {
   const [on, setOn] = React.useState(false)
   const toggle = () => setOn(!on)
+  // To transform the children JSX that your component receives as the children prop
+  return React.Children.map(children, child => {
+    // React dosen't allow developers to modify chilren's props directly
+    // it is advisable to create a new copy and set its props
+    // React.cloneElement(child, {on, toggle}),
 
-  // 🐨 replace this with a call to React.Children.map and map each child in
-  // props.children to a clone of that child with the props they need using
-  // React.cloneElement.
-  // 💰 React.Children.map(props.children, child => {/* return child clone here */})
-  // 📜 https://react.dev/reference/react/Children
-  // 📜 https://react.dev/reference/react/cloneElement
-  return <Switch on={on} onClick={toggle} />
+    // React doesn't want developers to pass any props to non-functions components
+    return typeof child.type === 'string'
+      ? child
+      : React.cloneElement(child, {on, toggle})
+  })
 }
 
 // 🐨 Flesh out each of these components
 
-// Accepts `on` and `children` props and returns `children` if `on` is true
-const ToggleOn = () => null
-
-// Accepts `on` and `children` props and returns `children` if `on` is false
-const ToggleOff = () => null
-
-// Accepts `on` and `toggle` props and returns the <Switch /> with those props.
-const ToggleButton = () => null
-
+// Warning: Normally a function component just take an argument called Props
+// be careful to destructure it correctly
+const ToggleOn = ({on, children}) => (on ? children : null)
+const ToggleOff = ({on, children}) => (on ? null : children)
+const ToggleButton = ({on, toggle}) => <Switch on={on} onClick={toggle} />
+// add DOM Component into our toggle component
 function App() {
   return (
     <div>
       <Toggle>
+        <span>Hello</span>
         <ToggleOn>The button is on</ToggleOn>
         <ToggleOff>The button is off</ToggleOff>
         <ToggleButton />
